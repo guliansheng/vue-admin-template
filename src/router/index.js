@@ -31,6 +31,18 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 export const constantRoutes = [
+  // 重定向回到当前页页面，用于刷新当前页
+  {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/redirect/:path(.*)',
+        component: () => import('@/views/redirect/index')
+      }
+    ]
+  },
   {
     path: '/login',
     component: () => import('@/views/login/index'),
@@ -67,8 +79,17 @@ export const asyncRoutes = [
       {
         path: 'table',
         name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'table', icon: 'table' }
+        component: () => import('@/views/table'),
+        meta: { title: 'table', icon: 'table' },
+        children: [
+          {
+            path: 'tableInfo/:id',
+            name: 'TableInfo',
+            component: () => import('@/views/table/tableInfo/index'),
+            meta: { title: 'tableInfo', activeMenu: '/example/table' },
+            hidden: true
+          }
+        ]
       },
       {
         path: 'tree',

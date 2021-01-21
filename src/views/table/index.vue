@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <el-table
+      v-show="!info"
       v-loading="listLoading"
       :data="list"
       element-loading-text="Loading"
@@ -23,7 +24,7 @@
           <span>{{ scope.row.author }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
+      <el-table-column label="PageViews" width="110" align="center">
         <template slot-scope="scope">
           {{ scope.row.pageviews }}
         </template>
@@ -39,12 +40,18 @@
           <span>{{ scope.row.display_time }}</span>
         </template>
       </el-table-column>
+      <el-table-column align="center" label="todo" width="200">
+        <template slot-scope="scope">
+          <el-button @click="toInfo">详情</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+    <router-view v-show="info" />
   </div>
 </template>
 
 <script>
-import { getList } from '@/api/table'
+// import { getList } from '@/api/table'
 
 export default {
   filters: {
@@ -59,8 +66,9 @@ export default {
   },
   data() {
     return {
+      info: false,
       list: null,
-      listLoading: true
+      listLoading: false
     }
   },
   created() {
@@ -68,10 +76,26 @@ export default {
   },
   methods: {
     fetchData() {
-      this.listLoading = true
-      getList().then(response => {
-        this.list = response.data.items
-        this.listLoading = false
+      // this.listLoading = true
+      this.list = [{
+        id: '@id',
+        title: '@sentence(10, 20)',
+        'status|1': ['published', 'draft', 'deleted'],
+        author: 'name',
+        display_time: '@datetime',
+        pageviews: '@integer(300, 5000)',
+        status: 'success'
+      }]
+      // getList().then(response => {
+      //   this.list = response.data.items
+      //   this.listLoading = false
+      // })
+    },
+    toInfo() {
+      this.info = true
+      const id = 1
+      this.$router.push({
+        path: `/example/table/tableInfo/${id}`
       })
     }
   }

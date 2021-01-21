@@ -15,7 +15,7 @@ import i18n from './lang' // internationalization
 
 import '@/icons' // icon
 import '@/permission' // permission control
-import './directive'
+import '@/directive'
 import * as filters from './filters' // global filters
 
 /**

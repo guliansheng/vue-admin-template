@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setRefreshToken, getRefreshToken, removeRefreshToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
@@ -36,17 +36,15 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      // login({ username: username.trim(), password: password }).then(response => {
-      //   const { data } = response
-      //   commit('SET_TOKEN', data.token)
-      //   setToken(data.token)
-      //   resolve()
-      // }).catch(error => {
-      //   reject(error)
-      // })
-      commit('SET_TOKEN', 'admin-token')
-      setToken('admin-token')
-      resolve()
+      login({ username: username, password: password, scope: ['a'] }).then(response => {
+        const { data } = response
+        commit('SET_TOKEN', data.access_token)
+        setToken(data.access_token)
+        setRefreshToken(data.refresh_token)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
     })
   },
 
@@ -83,29 +81,24 @@ const actions = {
 
   // user logout
   logout({ commit, state }) {
-    // return new Promise((resolve, reject) => {
-    //   logout(state.token).then(() => {
-    //     removeToken() // must remove  token  first
-    //     resetRouter()
-    //     commit('RESET_STATE')
-    //     resolve()
-    //   }).catch(error => {
-    //     reject(error)
-    //   })
-    // })
-    return new Promise(resolve => {
-      commit('SET_TOKEN', '')
-      commit('SET_ROLES', [])
-      removeToken()
-      resetRouter()
-      resolve()
+    return new Promise((resolve, reject) => {
+      logout(state.token).then(() => {
+        removeToken()
+        removeRefreshToken()
+        resetRouter()
+        commit('RESET_STATE')
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
     })
   },
 
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
-      removeToken() // must remove  token  first
+      removeToken()
+      removeRefreshToken()
       commit('RESET_STATE')
       resolve()
     })
